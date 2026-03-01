@@ -1,0 +1,3 @@
+host = redis-12941.crce263.ap-south-1-1.ec2.cloud.redislabs.com:12941
+port = 12941
+password = EfcWp1S9dL7Nr1ayGbZJr5cp5NfNvT5Y
