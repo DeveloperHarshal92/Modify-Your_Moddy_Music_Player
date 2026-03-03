@@ -17,7 +17,7 @@ router.post("/login", authController.loginUser);
  */
 router.get("/get-me", authMiddleware.authUser, authController.getMe);
 /**
- * @Route POST api/auth/logout
+ * @Route GET api/auth/logout
  */
 router.get("/logout", authController.logOutUser);
 module.exports = router;
