@@ -18,4 +18,10 @@ app.use(
 const authRoutes = require("./routes/auth.routes");
 app.use("/api/auth", authRoutes);
 
+/**
+ *  @Routes api/songs
+ */
+const songRoutes = require("./routes/song.routes");
+app.use("/api/songs", songRoutes);
+
 module.exports = app;
