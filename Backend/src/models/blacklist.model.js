@@ -1,11 +1,11 @@
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
 
 const blacklistSchema = new mongoose.Schema(
   {
     token: {
       type: String,
-      required: [true, "Token is required for blacklisting"],
-      unique: [true, "Token must be unique"],
+      required: [true, 'Token is required for blacklisting'],
+      unique: [true, 'Token must be unique'],
     },
   },
   {
@@ -13,6 +13,6 @@ const blacklistSchema = new mongoose.Schema(
   },
 );
 
-const blacklistModel = mongoose.model("blacklist", blacklistSchema);
+const blacklistModel = mongoose.model('blacklist', blacklistSchema);
 
-module.exports = blacklistModel;
+export default blacklistModel;

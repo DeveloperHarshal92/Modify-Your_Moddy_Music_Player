@@ -5,8 +5,7 @@ import { Link, useNavigate } from "react-router";
 import { useAuth } from "../hooks/useAuth";
 
 const Register = () => {
-  const { loading, handleRegister } = useAuth();
-
+  const { loading, error, handleRegister } = useAuth();
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
@@ -15,15 +14,21 @@ const Register = () => {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    await handleRegister({ username, email, password });
-    navigate("/");
+    const success = await handleRegister({ username, email, password });
+    if (success) {
+      navigate("/");
+    }
   }
 
   return (
-    <main className="register-page">
-      <div className="form-container">
-        <h1>Register</h1>
-        <form onSubmit={handleSubmit}>
+    <main className="auth-page">
+      <div className="auth-card">
+        <h1 className="auth-card__title">Create your account</h1>
+        <p className="auth-card__subtitle">Join Moodify and let your face pick the music.</p>
+
+        {error && <div className="auth-card__error">{error}</div>}
+
+        <form onSubmit={handleSubmit} className="auth-form">
           <FormGroup
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -45,12 +50,13 @@ const Register = () => {
             placeholder="Enter your password"
             type="password"
           />
-          <button className="btn" type="submit">
-            Register
+          <button className="auth-form__submit" type="submit" disabled={loading}>
+            {loading ? "Creating account…" : "Register"}
           </button>
         </form>
-        <p>
-          Already have an account ? <Link to="/login">&nbsp;Login</Link>{" "}
+
+        <p className="auth-card__footer">
+          Already have an account? <Link to="/login">Login</Link>
         </p>
       </div>
     </main>

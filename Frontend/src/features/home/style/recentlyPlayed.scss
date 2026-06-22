@@ -1,0 +1,62 @@
+.recently-played {
+  background-color: #1a1a1f;
+  border: 1px solid #2c2c33;
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.recently-played__status {
+  font-size: 13px;
+  color: #9a9aa3;
+}
+
+.recently-played__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f5f5f7;
+  margin-bottom: 14px;
+}
+
+.recently-played__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.recently-played__card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: #26262c;
+  }
+
+  img {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+}
+
+.recently-played__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f5f5f7;
+  flex: 1;
+}
+
+.recently-played__mood {
+  font-size: 11px;
+  color: #9a9aa3;
+  text-transform: capitalize;
+}

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from 'mongoose';
 
 const songSchema = new mongoose.Schema({
   url: {
@@ -13,15 +13,19 @@ const songSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  mood :{
-    type : String,
-    enum : {
-        values : ["sad","happy","surprised"],
-        message : "Enum this is..."
-    }
-  }
+  mood: {
+    type: String,
+    enum: {
+      values: ['sad', 'happy', 'surprised'],
+      message: 'Enum this is...',
+    },
+  },
+  playCount: {
+    type: Number,
+    default: 0,
+  },
 });
 
-const songModel = mongoose.model("songs", songSchema);
+const songModel = mongoose.model('songs', songSchema);
 
-module.exports = songModel;
+export default songModel;
