@@ -1,4 +1,5 @@
 import { useHistory } from "../hooks/useHistory";
+import { History, Play } from "lucide-react";
 import "../style/recentlyPlayed.scss";
 
 const RecentlyPlayed = ({ onSelectSong }) => {
@@ -13,22 +14,37 @@ const RecentlyPlayed = ({ onSelectSong }) => {
   }
 
   return (
-    <section className="recently-played">
-      <h2 className="recently-played__title">Recently Played</h2>
+    <div className="recently-played">
+      <h3 className="recently-played__title">
+        <History size={20} className="recently-played__title-icon" />
+        Recently Played
+      </h3>
       <div className="recently-played__list">
         {recent.map(({ song }) => (
           <button
             key={song._id}
-            className="recently-played__card"
+            className="recently-played__card group"
             onClick={() => onSelectSong(song._id)}
           >
-            <img src={song.posterUrl} alt={song.title} />
-            <span className="recently-played__name">{song.title}</span>
-            <span className="recently-played__mood">{song.mood}</span>
+            <div className="recently-played__img-wrapper">
+              <img src={song.posterUrl} alt={song.title} />
+              <div className="recently-played__img-overlay">
+                <Play fill="currentColor" size={20} className="text-white" />
+              </div>
+            </div>
+            
+            <div className="recently-played__info">
+              <h4 className="recently-played__name">{song.title}</h4>
+              <p className="recently-played__artist">{song.artist || "Unknown Artist"}</p>
+            </div>
+
+            <div className="recently-played__mood-badge">
+              <span>{song.mood}</span>
+            </div>
           </button>
         ))}
       </div>
-    </section>
+    </div>
   );
 };
 

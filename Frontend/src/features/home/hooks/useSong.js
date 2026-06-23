@@ -30,8 +30,12 @@ export const useSong = () => {
       const data = await getSong({ mood });
       setSong(data.song);
       navigate(`/player/${data.song._id}`);
+      return true;
     } catch (err) {
-      setError(err.response?.data?.message || "Couldn't find a song for that mood.");
+      setError(
+        err.response?.data?.message || "Couldn't find a song for that mood.",
+      );
+      return false;
     } finally {
       setLoading(false);
     }
@@ -49,7 +53,7 @@ export const useSong = () => {
       setSong(data.song);
 
       recordPlay(songId).catch((err) =>
-        console.error("Failed to record play:", err)
+        console.error("Failed to record play:", err),
       );
 
       await loadSimilar(songId);

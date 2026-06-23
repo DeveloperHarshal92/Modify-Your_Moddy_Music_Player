@@ -3,28 +3,63 @@ import {
     FilesetResolver
 } from "@mediapipe/tasks-vision";
 
+let globalLandmarker = null;
+let isInitializing = false;
 
 export const init = async ({ landmarkerRef, videoRef, streamRef }) => {
-    const vision = await FilesetResolver.forVisionTasks(
-        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
-    );
+    if (!globalLandmarker && !isInitializing) {
+        isInitializing = true;
+        try {
+            const vision = await FilesetResolver.forVisionTasks(
+                "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+            );
 
-    landmarkerRef.current = await FaceLandmarker.createFromOptions(
-        vision,
-        {
-            baseOptions: {
-                modelAssetPath:
-                    "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task"
-            },
-            outputFaceBlendshapes: true,
-            runningMode: "VIDEO",
-            numFaces: 1
+            globalLandmarker = await FaceLandmarker.createFromOptions(
+                vision,
+                {
+                    baseOptions: {
+                        modelAssetPath:
+                            "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task"
+                    },
+                    outputFaceBlendshapes: true,
+                    runningMode: "VIDEO",
+                    numFaces: 1
+                }
+            );
+        } finally {
+            isInitializing = false;
         }
-    );
+    } else if (isInitializing) {
+        // Wait for it to finish initializing if another component triggered it
+        while (isInitializing) {
+            await new Promise(r => setTimeout(r, 100));
+        }
+    }
 
-    streamRef.current = await navigator.mediaDevices.getUserMedia({ video: true });
+    landmarkerRef.current = globalLandmarker;
+
+    let stream = null;
+    let attempts = 0;
+    while (!stream && attempts < 3) {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        } catch (err) {
+            attempts++;
+            if (attempts >= 3) throw err;
+            await new Promise((r) => setTimeout(r, 500));
+        }
+    }
+    
+    streamRef.current = stream;
     videoRef.current.srcObject = streamRef.current;
-    await videoRef.current.play();
+    
+    try {
+        await videoRef.current.play();
+    } catch (err) {
+        if (err.name !== "AbortError") {
+            throw err;
+        }
+    }
 };
 
 export const detect = ({ landmarkerRef, videoRef, setExpression }) => {

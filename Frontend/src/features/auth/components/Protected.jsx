@@ -1,12 +1,13 @@
 import React from "react";
 import { useAuth } from "../hooks/useAuth";
 import { Navigate} from "react-router";
+import Loader from "../../../components/Loader";
 
 const Protected = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <h1>Loading...</h1>;
+    return <Loader message="Waking up the backend..." />;
   }
 
   if (!user) {

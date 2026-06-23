@@ -29,7 +29,6 @@ export default function FaceExpression({ onClick = () => {} }) {
     }
 
     if (landmarkerRef.current) {
-      landmarkerRef.current.close();
       landmarkerRef.current = null;
     }
   }, []);
@@ -54,9 +53,17 @@ export default function FaceExpression({ onClick = () => {} }) {
 
       if (result) {
         isDetectingRef.current = false;
-        setStatus("done");
-        killStream(); // kill the camera the instant a mood is matched
-        onClick(result); // parent will navigate away immediately after this
+        setStatus("processing");
+        
+        Promise.resolve(onClick(result)).then((success) => {
+          if (success === false) {
+            setStatus("ready");
+          } else {
+            setStatus("done");
+            killStream();
+          }
+        });
+        
         return;
       }
 
@@ -105,8 +112,7 @@ export default function FaceExpression({ onClick = () => {} }) {
       }
 
       setIsReady(true);
-      setStatus("detecting");
-      startDetection();
+      setStatus("ready");
     }
 
     setup();
@@ -126,11 +132,11 @@ export default function FaceExpression({ onClick = () => {} }) {
 
   return (
     <div className="face-expression">
-      <div className="face-expression__video-wrap">
+      <div className={`face-expression__video-wrap ${status === "detecting" || status === "processing" ? "detecting" : ""}`}>
         {status !== "done" && (
           <video ref={videoRef} className="face-expression__video" playsInline muted />
         )}
-        {status === "detecting" && (
+        {(status === "detecting" || status === "processing") && (
           <div className="face-expression__overlay">
             <span className="face-expression__pulse" />
           </div>
@@ -140,7 +146,7 @@ export default function FaceExpression({ onClick = () => {} }) {
         )}
       </div>
 
-      {status !== "done" && (
+      {status !== "done" && status !== "processing" && (
         <button
           className="face-expression__detect-btn"
           onClick={handleManualDetect}
@@ -152,8 +158,10 @@ export default function FaceExpression({ onClick = () => {} }) {
 
       <p className="face-expression__status">
         {status === "initializing" && "Starting camera…"}
+        {status === "ready" && "Camera ready. Click below when you're ready!"}
         {status === "detecting" && "Reading your expression…"}
-        {status === "done" && `Mood detected: ${expression} — redirecting…`}
+        {status === "processing" && `Mood detected: ${expression}. Finding song…`}
+        {status === "done" && `Redirecting to song…`}
         {status === "failed" && "Couldn't detect a face."}
       </p>
     </div>

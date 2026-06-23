@@ -22,42 +22,47 @@ const Register = () => {
 
   return (
     <main className="auth-page">
-      <div className="auth-card">
-        <h1 className="auth-card__title">Create your account</h1>
-        <p className="auth-card__subtitle">Join Moodify and let your face pick the music.</p>
+      <div className="auth-container auth-container--reverse">
+        <div className="auth-image auth-image--right"></div>
+        <div className="auth-content">
+          <div className="auth-card">
+            <h1 className="auth-card__title">Create your account</h1>
+            <p className="auth-card__subtitle">Join Moodify and let your face pick the music.</p>
 
-        {error && <div className="auth-card__error">{error}</div>}
+            {error && <div className="auth-card__error">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <FormGroup
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            label="Name"
-            placeholder="Enter your username"
-            type="text"
-          />
-          <FormGroup
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            label="Email"
-            placeholder="Enter your email"
-            type="text"
-          />
-          <FormGroup
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            label="Password"
-            placeholder="Enter your password"
-            type="password"
-          />
-          <button className="auth-form__submit" type="submit" disabled={loading}>
-            {loading ? "Creating account…" : "Register"}
-          </button>
-        </form>
+            <form onSubmit={handleSubmit} className="auth-form">
+              <FormGroup
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                label="Name"
+                placeholder="Enter your username"
+                type="text"
+              />
+              <FormGroup
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                label="Email"
+                placeholder="Enter your email"
+                type="text"
+              />
+              <FormGroup
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                label="Password"
+                placeholder="Enter your password"
+                type="password"
+              />
+              <button className="auth-form__submit" type="submit" disabled={loading}>
+                {loading ? "Creating account…" : "Register"}
+              </button>
+            </form>
 
-        <p className="auth-card__footer">
-          Already have an account? <Link to="/login">Login</Link>
-        </p>
+            <p className="auth-card__footer">
+              Already have an account? <Link to="/login">Login</Link>
+            </p>
+          </div>
+        </div>
       </div>
     </main>
   );

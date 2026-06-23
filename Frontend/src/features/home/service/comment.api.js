@@ -14,3 +14,13 @@ export async function postComment(songId, text) {
     const response = await api.post(`/api/comments/${songId}`, { text })
     return response.data
 }
+
+export async function likeCommentApi(commentId) {
+    const response = await api.post(`/api/comments/${commentId}/like`)
+    return response.data
+}
+
+export async function replyToCommentApi(commentId, text) {
+    const response = await api.post(`/api/comments/${commentId}/reply`, { text })
+    return response.data
+}

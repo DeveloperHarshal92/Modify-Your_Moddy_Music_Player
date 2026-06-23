@@ -1,5 +1,26 @@
 import mongoose from 'mongoose';
 
+const replySchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'users',
+      required: true,
+    },
+    username: {
+      type: String,
+      required: true,
+    },
+    text: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 500,
+    },
+  },
+  { timestamps: true }
+);
+
 const commentSchema = new mongoose.Schema(
   {
     song: {
@@ -23,6 +44,13 @@ const commentSchema = new mongoose.Schema(
       trim: true,
       maxlength: 500,
     },
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users',
+      },
+    ],
+    replies: [replySchema],
   },
   { timestamps: true }
 );

@@ -1,4 +1,5 @@
 import { useSearch } from "../hooks/useSearch";
+import { Search } from "lucide-react";
 import "../style/searchBar.scss";
 
 const SearchBar = ({ onSelectSong }) => {
@@ -6,13 +7,16 @@ const SearchBar = ({ onSelectSong }) => {
 
   return (
     <div className="search-bar">
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => handleChange(e.target.value)}
-        placeholder="Search songs by title…"
-        className="search-bar__input"
-      />
+      <div className="search-bar__input-wrapper">
+        <Search size={18} className="search-bar__icon" />
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => handleChange(e.target.value)}
+          placeholder="Search songs by title…"
+          className="search-bar__input"
+        />
+      </div>
       {loading && <span className="search-bar__spinner" />}
 
       {results.length > 0 && (
