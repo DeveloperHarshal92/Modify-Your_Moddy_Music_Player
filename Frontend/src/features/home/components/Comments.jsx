@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ThumbsUp, MessageSquare } from "lucide-react";
+import { ThumbsUp, MessageSquare, Send } from "lucide-react";
 import { useComments } from "../hooks/useComments";
 import { useAuth } from "../../auth/hooks/useAuth";
 import "../style/comments.scss";
@@ -28,48 +28,54 @@ const Comments = ({ songId }) => {
 
   return (
     <section className="comments">
-      <h2 className="comments__title">Reviews</h2>
+      <h2 className="comments__title">Community Reviews</h2>
 
       <form className="comments__form" onSubmit={handleSubmit}>
         <textarea
           className="comments__input"
-          placeholder="Share your thoughts on this track…"
+          placeholder="Share your thoughts on this track or mood vibe…"
           value={text}
           onChange={(e) => setText(e.target.value)}
           maxLength={500}
           required
         />
         <button className="comments__submit" type="submit" disabled={posting}>
-          {posting ? "Posting…" : "Post"}
+          {posting ? "Posting…" : "Post Review"}
         </button>
       </form>
 
       {error && <div className="comments__error">{error}</div>}
 
       {loading ? (
-        <p className="comments__status">Loading comments…</p>
+        <p className="comments__status">Loading community reviews…</p>
       ) : comments.length === 0 ? (
-        <p className="comments__status">No reviews yet. Be the first to share your thoughts.</p>
+        <p className="comments__status">No reviews yet. Be the first to share your thoughts!</p>
       ) : (
         <ul className="comments__list">
           {comments.map((c) => (
             <li key={c._id} className="comments__item">
-              <p className="comments__item-username">{c.username}</p>
+              <div className="comments__item-header">
+                <div className="comments__avatar">
+                  {(c.username || "U").slice(0, 1).toUpperCase()}
+                </div>
+                <p className="comments__item-username">{c.username}</p>
+              </div>
+
               <p className="comments__item-text">{c.text}</p>
-              
+
               <div className="comments__item-actions">
-                <button 
-                  className={`comments__action-btn ${c.likes?.includes(user?.id) ? 'comments__action-btn--active' : ''}`}
+                <button
+                  className={`comments__action-btn ${c.likes?.includes(user?.id) ? "comments__action-btn--active" : ""}`}
                   onClick={() => handleLikeComment(c._id)}
                 >
-                  <ThumbsUp size={14} />
+                  <ThumbsUp size={13} />
                   <span>{c.likes?.length || 0}</span>
                 </button>
-                <button 
+                <button
                   className="comments__action-btn"
                   onClick={() => setActiveReplyId(activeReplyId === c._id ? null : c._id)}
                 >
-                  <MessageSquare size={14} />
+                  <MessageSquare size={13} />
                   <span>Reply</span>
                 </button>
               </div>
@@ -79,12 +85,14 @@ const Comments = ({ songId }) => {
                   <input
                     type="text"
                     className="comments__reply-input"
-                    placeholder="Write a reply..."
+                    placeholder="Write a response..."
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     required
                   />
-                  <button type="submit" className="comments__reply-submit">Send</button>
+                  <button type="submit" className="comments__reply-submit">
+                    Send
+                  </button>
                 </form>
               )}
 

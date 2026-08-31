@@ -1,5 +1,11 @@
 import { getSong, getSongById, getSimilarSongs } from "../service/song.api";
 import { recordPlay } from "../service/history.api";
+import {
+  getPublicSongByMood,
+  getPublicSongById,
+  getPublicSimilarSongs,
+  PUBLIC_TRACKS,
+} from "../data/publicMusicCatalog";
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router";
 import { SongContext } from "../context/song.context";
@@ -14,58 +20,91 @@ export const useSong = () => {
 
   async function loadSimilar(songId) {
     try {
+      if (songId && String(songId).startsWith("pub-")) {
+        setSimilar(getPublicSimilarSongs(songId));
+        return;
+      }
       const data = await getSimilarSongs(songId);
-      setSimilar(data.similar);
+      if (data && data.similar && data.similar.length > 0) {
+        setSimilar(data.similar);
+      } else {
+        setSimilar(getPublicSimilarSongs(songId));
+      }
     } catch (err) {
-      console.error("Failed to fetch similar songs:", err);
+      console.warn("Falling back to public similar tracks:", err.message);
+      setSimilar(getPublicSimilarSongs(songId));
     }
   }
 
-  // Called by the mood-detection flow. Fetches a random song for the mood,
+  // Called by the mood-detection flow. Fetches a song for the mood,
   // then redirects to its dedicated player page.
   async function handleGetSong({ mood }) {
     setLoading(true);
     setError(null);
     try {
-      const data = await getSong({ mood });
-      setSong(data.song);
-      navigate(`/player/${data.song._id}`);
+      let matchedSong = null;
+      try {
+        const data = await getSong({ mood });
+        if (data && data.song) {
+          matchedSong = data.song;
+        }
+      } catch (apiErr) {
+        console.warn("Backend song API unavailable, using public catalog:", apiErr.message);
+      }
+
+      if (!matchedSong) {
+        matchedSong = getPublicSongByMood(mood);
+      }
+
+      setSong(matchedSong);
+      navigate(`/player/${matchedSong._id}`);
       return true;
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Couldn't find a song for that mood.",
-      );
-      return false;
+      const fallback = getPublicSongByMood(mood);
+      setSong(fallback);
+      navigate(`/player/${fallback._id}`);
+      return true;
     } finally {
       setLoading(false);
     }
   }
 
-  // Called when the player page itself loads (direct URL, refresh, or a
-  // click from Recently Played / Search). Loads the song by ID, records
-  // the play, and fetches similar tracks — does NOT navigate, since the
-  // caller is already on the player route.
+  // Loads song by ID (supports public catalog IDs or Mongo ObjectIds)
   async function loadSongById(songId) {
     setLoading(true);
     setError(null);
     try {
-      const data = await getSongById(songId);
-      setSong(data.song);
+      if (songId && String(songId).startsWith("pub-")) {
+        const pubSong = getPublicSongById(songId);
+        if (pubSong) {
+          setSong(pubSong);
+          await loadSimilar(songId);
+          return;
+        }
+      }
 
-      recordPlay(songId).catch((err) =>
-        console.error("Failed to record play:", err),
-      );
+      try {
+        const data = await getSongById(songId);
+        if (data && data.song) {
+          setSong(data.song);
+          recordPlay(songId).catch(() => {});
+          await loadSimilar(songId);
+          return;
+        }
+      } catch (err) {
+        console.warn("Song not in backend DB, checking public catalog:", err.message);
+      }
 
-      await loadSimilar(songId);
+      const fallback = getPublicSongById(songId) || PUBLIC_TRACKS[0];
+      setSong(fallback);
+      await loadSimilar(fallback._id);
     } catch (err) {
-      setError(err.response?.data?.message || "Song not found.");
+      setError("Unable to load track.");
     } finally {
       setLoading(false);
     }
   }
 
-  // Called when clicking a result in Search / Recently Played from the
-  // Home page — navigates to that song's player page.
   function goToSong(songId) {
     navigate(`/player/${songId}`);
   }
@@ -75,8 +114,10 @@ export const useSong = () => {
     error,
     song,
     similar,
+    publicTracks: PUBLIC_TRACKS,
     handleGetSong,
     loadSongById,
     goToSong,
   };
 };
+
